@@ -1,0 +1,117 @@
+#include <iostream>
+#include <ctime>
+#include <chrono>
+#include <thread>
+
+void drawBoard(char *spaces);
+void playerMove(char *spaces, char player);
+void computerMove(char *spaces, char computer);
+bool checkWin(char *spaces, char computer, char player);
+bool checkTie(char *spaces);
+
+int main(){
+    char spaces[9];
+    std::fill(spaces, spaces + 9, ' ');
+    char player = 'X';
+    char computer = 'O';
+    bool running = true;
+    srand(time(0));
+
+    drawBoard(spaces);
+
+    while(running){
+        playerMove(spaces, player);
+        drawBoard(spaces);
+        
+        if(checkWin(spaces, player ,computer) || checkTie(spaces)){
+            running = false;
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        computerMove(spaces, computer);
+        drawBoard(spaces);
+
+        if(checkWin(spaces, player ,computer) || checkTie(spaces)){
+            running = false;
+            break;
+        }
+    }
+
+    return 0;
+}
+
+void drawBoard(char *spaces){
+    std::cout << '\n';
+    std::cout << "     |     |     \n";
+    std::cout << "  "<< spaces[0] << "  |  " << spaces[1] <<"  |  "<< spaces[2] <<"  \n";
+    std::cout << "1____|2____|3____\n";
+    std::cout << "     |     |     \n";
+    std::cout << "  "<< spaces[3] << "  |  " << spaces[4] <<"  |  "<< spaces[5] <<"  \n";
+    std::cout << "4____|5____|6____\n";
+
+    std::cout << "     |     |     \n";
+    std::cout << "  "<< spaces[6] << "  |  " << spaces[7] <<"  |  "<< spaces[8] <<"  \n";
+    std::cout << "7    |8    |9    \n";
+    std::cout << '\n';
+
+
+}
+void playerMove(char *spaces, char player){
+    int number;
+    do{
+        std::cout << "Enter a spot to place your marker (1-9) \n> ";
+        std::cin >> number;
+        number --;
+    }while(number < 0 || number > 8 || spaces[number] != ' ');
+
+    spaces[number] = player;
+
+}
+
+void computerMove(char *spaces, char computer){
+    int number;
+    do{
+        number = rand() % 9;    
+    }while(spaces[number] != ' ');
+    
+
+    spaces[number] = computer;
+}
+bool checkWin(char *spaces, char player, char computer){
+    for(int i = 0; i <9; i+= 3){
+        if (spaces[i] != ' ' && spaces[i] == spaces[i+1] && spaces[i+1] == spaces[i+2]){
+            spaces[i] == player ? std::cout << "You WON !!!" : std::cout << "You LOST !!!";
+            return true;
+            
+        }
+    }
+    
+    for(int i = 0; i <3; i+= 1){
+        if (spaces[i] != ' ' && spaces[i] == spaces[i+3] && spaces[i+3] == spaces[i+6]){
+            spaces[i] == player ? std::cout << "You WON !!!" : std::cout << "You LOST !!!";
+            return true;
+            
+        }
+    }
+
+    if (spaces[0]!= ' ' && spaces[0] == spaces[4] && spaces[4] == spaces[8]){
+            spaces[0] == player ? std::cout << "You WON !!!" : std::cout << "You LOST !!!";
+            return true;
+    }
+    if (spaces[2]!= ' ' && spaces[2] == spaces[4] && spaces[4] == spaces[6]){
+            spaces[2] == player ? std::cout << "You WON !!!" : std::cout << "You LOST !!!";
+            return true;
+    }
+    return false;
+}
+bool checkTie(char *spaces){
+    for (int i = 0; i < 9; i++){
+        if(spaces[i ] == ' '){
+            return false;
+        }
+    }
+    std::cout << "It's a Tie !";
+    return true;
+}
